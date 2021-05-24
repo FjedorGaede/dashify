@@ -1,7 +1,11 @@
 from dash.dependencies import Input, Output
 from dash import Dash
-from flask import Flask
+from flask import Flask, render_template
+import flask
 import dash_html_components as html
+from dash_auth.basic_auth import Auth 
+import pathlib
+from six import iteritems
 
 
 def change_flask_server(self, flask_app: Flask, new_route: str):
@@ -30,6 +34,8 @@ def change_flask_server(self, flask_app: Flask, new_route: str):
     # Set new urls for dash and build flask Blueprint in new flask app
     self.routes = []
     self.init_app(flask_app)
+
+    
 
 # append new method to class Dash
 Dash.change_flask_server = change_flask_server    
@@ -88,7 +94,8 @@ def DashifySecure(secure_method):
     def secure(app:Dash, *args, **kwargs):
 
         # security Div where whole app.layout is put into
-        app.layout = html.Div(children=app.layout, id="security-div")
+        securelayout = app.layout
+        app.layout = html.Div(id="security-div")
 
         # callback to check on initilization if user is authorized
         @app.callback(
@@ -97,12 +104,83 @@ def DashifySecure(secure_method):
         )
         def security(children):
             if secure_method(*args, **kwargs) == True:
-                return children
+                return securelayout
             else:
                 return "NOT AUTHORIZED"
 
     return secure
+
+def _protect_views(self):
+    # Only views that are from dash app and not flask views / routes
+    views_dash_app = [view_name for view_name, view_method in self.app.server.view_functions.items() \
+        if view_name.startswith(self._index_view_name)]
+    for view_name, view_method in iteritems(
+                self.app.server.view_functions):
+            if view_name in views_dash_app and view_name != self._index_view_name:
+                self.app.server.view_functions[view_name] = \
+                    self.auth_wrapper(view_method)
+Auth._protect_views = _protect_views
+class BasicAuth(Auth):
+    def __init__(self, app, secure_method, *args, **kwargs):
+        Auth.__init__(self, app, _overwrite_index = True)
+        self.secure_method = secure_method
+        self.args = args
+        self.kwargs = kwargs
+
+    def is_authorized(self):
+        header = flask.request.headers.get('Authorization', None)
+        if not header:
+            return False
+        return self.secure_method(self.args, self.kwargs)
     
+    def login_request(self):
+        return flask.Response(
+            'Login Required',
+            headers={'WWW-Authenticate': 'Basic realm="User Visible Realm"'},
+            status=401)
+
+    def auth_wrapper(self, f):
+        def wrap(*args, **kwargs):
+            if not self.is_authorized():
+                return flask.Response(status=403)
+
+            response = f(*args, **kwargs)
+            return response
+        return wrap
+
+    def index_auth_wrapper(self, original_index):
+        def wrap(*args, **kwargs):
+            if self.is_authorized():
+                return original_index(*args, **kwargs)
+            else:
+                # return self.login_request()
+                try:
+                    errorfile_403 =  pathlib.Path(__file__).Parent.absolute() / "error-templates/403.html"
+                    return flask.render_template(errorfile_403), 403
+                except:
+                    return flask.Response(status=403)
+        return wrap
 
 
+# Decorator not working yet
 
+
+# def DashifySecure(secure_method, *args, **kwargs):
+#     """Make dash app secure with own security method. Accepts an method to check for security and further parameters necessary for security method.
+#     instantiates BasicAuth object for dash app.
+
+#     Parameters
+#     ----------
+#     secure_method : function
+#         own security function
+#     """
+#     def get_app(app):
+#         # def auth(app):
+#         app = app()
+#         BasicAuth(
+#                 app,
+#                 secure_method,
+#                 args, kwargs
+#             )
+#         return app
+#     return get_app
