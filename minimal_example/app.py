@@ -1,8 +1,9 @@
 # - Import Flask - #
-from flask import Flask
+# from dashify.dashify import DashifySecure
+from flask import Flask, redirect
 
 # - Import Dashify - #
-from dashify import Dashify, BasicAuth
+from dashify import Dashify, DashifySecure, dash_secure
 
 
 # - Import Standalone Dash apps - # 
@@ -42,26 +43,22 @@ def dash_app():
 
 # Setup security functionality by using the provided methods of the security backend
 # secure = DashifySecure(secure_method = security_method)
+def access_denied_behavior():
+    return redirect('/')
+DashifySecure(secure_method = security_method)
 
-
-# @app.route('/secure-dash', methods=['GET'])
-# def secure_dash_app():
-#     return SecretDashApp
 
 # Secured Dash App
-# @DashifySecure(security_method, ['Alex'])
+@dash_secure(allowed_users = ['Pete'])
 @app.dash_route('/secured/dash_app')
 def dash_app():
     return SecretDashApp
 
-auth = BasicAuth(
-    SecretDashApp,
-    security_method,
-    ['Peter']
-)
+def dumbsecmethod():
+    return True
 
 # Interactive Visualization Dash app
-# @DashifySecure(security_method, ['Peter'])
+@dash_secure(secure_method = dumbsecmethod, access_denied_behavior=access_denied_behavior)
 @app.dash_route('/interactive_visualization')
 def visualization_app():
     return InteractiveVisualApp
