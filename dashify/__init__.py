@@ -1,1 +1,1 @@
-from .dashify import Dashify, DashifySecure, dash_route, Dash, change_flask_server, BasicAuth
+from .dashify import Dashify, DashifySecure, dash_route, Dash, change_flask_server, BasicAuth, dash_secure
