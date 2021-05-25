@@ -31,8 +31,18 @@ def change_flask_server(self, flask_app: Flask, new_route: str):
     self.routes = []
     self.init_app(flask_app)
 
+    
+    
+    return self
+    
+def init_after_change_flask_server(self):
+    """function that is executed after initilization of dash into flask server
+    """
+    pass
+
 # append new method to class Dash
-Dash.change_flask_server = change_flask_server    
+Dash.change_flask_server = change_flask_server
+Dash.init_after_change_flask_server = init_after_change_flask_server   
 
 
 def dash_route(app:object, url:str):
@@ -54,7 +64,9 @@ def dash_route(app:object, url:str):
     def wrap_f(func):
         def init_app():
             dash_app = func() # get DashApp-Object
-            dash_app.change_flask_server(app, url) # change flask server and init new url
+            dash_app = dash_app.change_flask_server(app, url) # change flask server and init new url
+            dash_app.init_after_change_flask_server()
+            return dash_app
         return init_app()
         
     return wrap_f
