@@ -1,8 +1,5 @@
-from dash.dependencies import Input, Output
 from dash import Dash
 from flask import Flask
-import dash_html_components as html
-
 
 def change_flask_server(self, flask_app: Flask, new_route: str):
     """Exchange the flask app and the routes
@@ -30,19 +27,18 @@ def change_flask_server(self, flask_app: Flask, new_route: str):
     # Set new urls for dash and build flask Blueprint in new flask app
     self.routes = []
     self.init_app(flask_app)
-
-    
     
     return self
-    
+
 def init_after_change_flask_server(self):
-    """function that is executed after initilization of dash into flask server
+    """function that is executed after initilization of dash into flask server.
+    For example, use it when a configuration from flask is needed
     """
     pass
 
 # append new method to class Dash
 Dash.change_flask_server = change_flask_server
-Dash.init_after_change_flask_server = init_after_change_flask_server   
+Dash.init_after_change_flask_server = init_after_change_flask_server     
 
 
 def dash_route(app:object, url:str):
@@ -59,7 +55,6 @@ def dash_route(app:object, url:str):
     # Check if url is ended with a /
     if url[-1] != "/":
         url += "/"
-
 
     def wrap_f(func):
         def init_app():
@@ -85,36 +80,4 @@ def Dashify(app:Flask):
         Flask application
     """
     app.dash_route = dash_route.__get__(app)
-
-def DashifySecure(secure_method):
-    """Make dash app secure with own security method. Accepts an method to check for security.
-    Dash app layout gets inititated with an security Div where the content is put in
-    Callback checks on runtime if security method is matched
-    If security method returns not True, an "Unauthorized" message appears
-
-    Parameters
-    ----------
-    secure_method : function
-        own security function
-    """
-    def secure(app:Dash, *args, **kwargs):
-
-        # security Div where whole app.layout is put into
-        app.layout = html.Div(children=app.layout, id="security-div")
-
-        # callback to check on initilization if user is authorized
-        @app.callback(
-            Output("security-div", "children"),
-            Input("security-div", "children")
-        )
-        def security(children):
-            if secure_method(*args, **kwargs) == True:
-                return children
-            else:
-                return "NOT AUTHORIZED"
-
-    return secure
-    
-
-
 
