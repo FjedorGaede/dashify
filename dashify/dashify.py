@@ -31,6 +31,7 @@ def change_flask_server(self, flask_app: Flask, new_route: str):
     return self
 
 # append new method to class Dash
+# Important Note: This has an impact on the actual implementation of the Dash class in the dash module! When importing dashify you will experience that the dash objects have a new method named `change_flask_server`. This has the advantage that as long as dashify is imported the Dash apps are extended properly and can be used with the `dash_route` decorator.
 Dash.change_flask_server = change_flask_server
 
 
