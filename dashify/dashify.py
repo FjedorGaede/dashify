@@ -53,8 +53,7 @@ def dash_route(app:object, url:str):
     def wrap_f(func):
         def init_app():
             dash_app = func() # get DashApp-Object
-            dash_app = dash_app.change_flask_server(app, url) # change flask server and init new url
-            return dash_app
+            return dash_app.change_flask_server(app, url) # change flask server and init new url
         return init_app()
         
     return wrap_f

@@ -1,5 +1,6 @@
 from setuptools import setup, find_packages
 import pathlib
+import os
 
 here = pathlib.Path(__file__).parent.resolve()
 
@@ -23,7 +24,8 @@ setup(
     python_requires='>=3.6',
     install_requires=[
                     'Flask',
-                    'Dash'
-                    ]
+                    'Dash',
+                    'Dash-Auth==1.4.1'
+                    ],
 
 )
