@@ -16,7 +16,7 @@ from security_backend import get_current_user, security_method
 
 
 """ 
-This is a Flask app that is extended by importing dash apps.
+This is a Flask app that is extended by importing dash apps and assigning them to a certain route. This example illustrates how to set up a route for a dash app and how to secure it with a decorator and security methods.
 """
 
 # Create new Flask app
@@ -35,29 +35,31 @@ def index():
     <p><a href='/secured/dash_app'>A secret dash</a></p>
     """
 
-# Normal Dash App
+# Minimal example imported Dash App
 @app.dash_route('/minimal_dash')
 def dash_app():
     return MinimalDashApp
 
 
-# Setup security functionality by using the provided methods of the security backend
-# secure = DashifySecure(secure_method = security_method)
-def access_denied_behavior():
-    return redirect('/')
+# Setup security functionality by using the provided methods of the security backend. This adds the possibility to use a decorator that checks if the secure_method returns True or False. This changes the global behaviour of the `dash_secure` decorator.
 DashifySecure(secure_method = security_method)
 
 
-# Secured Dash App
-@dash_secure(allowed_users = ['Pete'])
+# Secured Dash App by using the security backend 
+@dash_secure(allowed_users = ['Mariah']) # Change the list of users here to allow access (In this case the current user it checks access for is called 'Alex')
 @app.dash_route('/secured/dash_app')
 def dash_app():
     return SecretDashApp
 
+
+# To change the access method for a certain app one can also define another `access_denied_behavior` and security method. These can then be inserted in a certain `dash_secure` decorator for only using this access method in that case. 
+def access_denied_behavior():
+    return redirect('/')
+
 def dumbsecmethod():
     return True
 
-# Interactive Visualization Dash app
+# Interactive Visualization Dash app that is secured with a custom secure_method and also has a custom access denied behavior.
 @dash_secure(secure_method = dumbsecmethod, access_denied_behavior=access_denied_behavior)
 @app.dash_route('/interactive_visualization')
 def visualization_app():
