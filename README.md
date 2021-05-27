@@ -1,13 +1,14 @@
 # Dashify
-Dashify integrates your Dash applications into your Flask app by using easy syntax very near to Flask itself. Additionally, it provides security funtionality for your Dash app.
+Dashify integrates your Dash applications into your Flask app by using easy syntax which are close to the Flask syntax. Additionally, it provides security funtionality for your Dash app.
 
 # Usage of Dashify
-The general usage of Dashify is described below. It is assumed that you have one file for each Dash application and one for your Flask app.
+The general usage of Dashify is described below. It is assumed that each Dash app is provided in a separate file and are imported in the main file the Flask app is created in. For a minimal example check the `minimal_example` directory.
 ## Dash
-The creation of the dash app is similar with dash itself, except you should import Dash from dashify.
+When creating a Dash app you do not have to change any syntax or add additional methods or parameters. You just write your Dash app as you always do. It is also possible to test the Dash app "locally" in the file you are creating it before importing it to the Flask app. See the example below.
 ``` python
-# For using dashify, you need to use the dash class from Dashify
-from dashify import Dash
+# some_dash_app.py
+# Importing Dash from dash
+from dash import Dash
 
 # Build you Dash application 
 SomeDashApp = Dash(__name__)
@@ -19,6 +20,10 @@ SomeDashApp.layout = html.Div(...)
 SomeDashApp.callback(...)
 def callback(...):
     return output
+    
+# Test the app 'locally' without Flask providing your Flask app.
+if __name__ == '__main__':
+    SomeDashApp.run_server(debug=True)
 ```
 ## Flask
 ```python
@@ -30,7 +35,10 @@ from dashify import Dashify, dash_route
 # You need to dashify your flask application by using this line in your flask code:
 Dashify(app)
 
-# Then you are able to append the dash app with a given url to the flask app
+# Import dash app
+from some_dash_app import SomeDashApp
+
+# Then you are able to append the dash app with a given url route to the flask app
 @app.dash_route('/dash_app')
 def dash_app():
     """ 
