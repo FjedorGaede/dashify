@@ -71,7 +71,7 @@ def access_denied_behavior():
 ```
 Note: The return value has to be either a flask template or redirection
 ### Integrate dash security into your app
-You can integrate security by using `DashifySecure` and providing a method to check for access rights for the argument `secure_method`. This enables us to use the decorator `@dash_secure` above the `@app.dash_route`. It takes in all the arguments and keyword arguments of your security method. In this case this is the `allowed_users` list. 
+You can integrate security by using `DashifySecure` and providing a method to check for access rights for the argument `secure_method`. This enables us to use the decorator `@dash_secure` above the `@app.dash_route`. It takes in all the arguments and keyword arguments of your security method. In this case it is the `allowed_users` list. 
 ```python
 from flask import Flask
 app = Flask(__name__)
@@ -96,7 +96,7 @@ DashifySecure(
 def dash_app():
     return SomeDashApp
 ```
-As we can see above we globally provide a security method by using `DashifySecure(secure_method = security_method)`. Additionally, it is possible to provide the security and access denied methods for a single dash application route by adding passing them into the `@dash_secure` decorator as you can see in the example below.
+As we can see above we globally provide a security method by using `DashifySecure(secure_method = security_method)`. Additionally, it is possible to provide the security and access denied methods for a single dash application route by passing them into the `@dash_secure` decorator as you can see in the example below.
 ```python
 from flask import Flask
 app = Flask(__name__)
