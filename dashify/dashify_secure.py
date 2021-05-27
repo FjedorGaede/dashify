@@ -183,8 +183,6 @@ def dash_secure(secure_method = None  , access_denied_behavior = None, *args, **
     access_denied_behavior : function, optional
         custom behavior when access denied method (can get set also by using method DashifySecure), by default None
     """
-    print(args)
-    print(kwargs)
     def gen_auth(app):
         """Generates the BasicAuth Object
 
