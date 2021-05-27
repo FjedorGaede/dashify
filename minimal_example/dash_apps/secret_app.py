@@ -1,5 +1,5 @@
 
-from dashify import Dash # Extended Dash class from the dashify package 
+from dash import Dash # Extended Dash class from the dashify package 
 import dash_html_components as html
 
 # New example Dash app
